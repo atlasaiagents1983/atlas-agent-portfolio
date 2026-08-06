@@ -1,0 +1,88 @@
+# Hermes Agent Configuration (scrubbed for portfolio)
+# Profile: atlas-business
+# Live on: Hermes v0.19.0 Quicksilver
+#
+# This is the actual production config with API keys replaced with <REDACTED>.
+# The structure, model routing, fallback chain, MCP servers, and toolsets are real.
+
+config_version: 23
+profile: atlas-business
+
+model:
+  default: gpt-5.5
+  provider: openai-codex
+
+fallback:
+  - provider: openrouter
+    model: deepseek/deepseek-v4-flash
+  - provider: openrouter
+    model: google/gemini-3.1-flash-lite
+  - provider: openrouter
+    model: openai/gpt-4.1-mini
+
+# ─── Model Routing Rules ───
+#
+# Default     : GPT-5.5 via OpenAI Codex — all casual chat, research, file ops
+# Fallback    : OpenRouter cheap tier only — never Sonnet, never Opus
+# Sonnet 4.6  : Manual invoke only — client emails, demo code, critical writing
+# Opus 4.7    : /model opus only — explicit high-stakes reasoning
+# Cron jobs   : GPT-5.5 by default — Sonnet caused $20 overnight bleed (Apr 2026)
+
+# ─── MCP Servers (5 active) ───
+mcp_servers:
+  playwright:
+    command: npx
+    args:
+      - -y
+      - "@playwright/mcp@latest"
+    env: {}
+    enabled: true
+
+  github:
+    command: npx
+    args:
+      - -y
+      - "@modelcontextprotocol/server-github"
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: <REDACTED>
+    enabled: true
+
+  firecrawl:
+    command: npx
+    args:
+      - -y
+      - firecrawl-mcp
+    env: {}
+    enabled: true
+
+  context7:
+    command: npx
+    args:
+      - -y
+      - "@upstash/context7-mcp"
+    env:
+      CONTEXT7_API_KEY: <REDACTED>
+    enabled: true
+
+  exa:
+    command: npx
+    args:
+      - -y
+      - exa-mcp-server
+    env:
+      EXA_API_KEY: <REDACTED>
+    enabled: true
+
+# ─── Enabled Models ───
+enabled_models:
+  - openai-codex:gpt-5.5
+  - openrouter:deepseek/deepseek-v4-flash
+  - openrouter:google/gemini-3.1-flash-lite
+  - openrouter:openai/gpt-4.1-mini
+  - xai-oauth:grok-4.3
+
+# ─── Tool Limits ───
+tool_limits:
+  max_tools_per_session: 80
+  max_concurrent_subagents: 3
+  max_delegation_depth: 1
